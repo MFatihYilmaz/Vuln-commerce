@@ -1,0 +1,53 @@
+*{
+    box-sizing: border-box;
+}
+body{
+    background-color: #f6e49b;
+}
+.row.h-600{
+    height:600px;
+}
+#neubar {
+    background: #f3cc33;
+    box-shadow: 4px 6px 12px rgba(0,0,0,0.4);
+    height: 5em;
+  }
+  
+
+  .nav-item .active {
+    border-bottom:black 2px solid ;
+}
+a
+{
+    text-decoration: none;
+}
+input{
+    border-radius: 10px;
+}
+input:focus {
+    outline: none;
+    /* Dilediğiniz diğer stillemeleri ekleyebilirsiniz */
+}
+
+  #neubar .nav-item a:hover {
+
+        /* top: -10px; */
+        transform: translateY(-3px);
+  }
+  #neubar .nav-item {
+    margin : auto 4px;
+  }
+  #neubar a {
+  
+    padding-left:12px;
+    padding-right:12px;
+  }
+  #neubar .dropdown-menu {
+    background : #545454
+  }
+  a.navbar-brand {
+    color: #454545
+  }
+  input:invalid {
+    border: 2px dashed red;
+  }
