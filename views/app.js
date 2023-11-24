@@ -59,6 +59,9 @@ async function resetPassword(){
             user_name:document.getElementById('username').value
         })
     }).then(response=>response.json())
+    ASDSKKKKKKKKKKK
+    aSDLASDL
+    ASLDASLDAD
     .then(data=>{
         if(data.link){
             document.getElementsByClassName('warning')[0].innerHTML="";
