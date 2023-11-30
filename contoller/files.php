@@ -21,9 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $jwt) {
       
     header('Content-Type: application/json'); 
     $target_file = '/var/www/html/apps/views/uploads/'.$_FILES["file"]["name"];
-    $imageFileType = explode('.',$_FILES["file"]["name"]);
-    if ($imageFileType[1] != "jpg" && $imageFileType[1] != "png" && $imageFileType[1] != "jpeg") {
-        echo json_encode(['message'=>"Sorry, only JPG, JPEG, PNG files are allowed."]);
+    $type=$_FILES['file']['type'];
+    
+    $allowed_file_types = ['jpg', 'jpeg', 'png'];
+    $allowed_mime_types=['image/png','image/jpg','image/jpeg'];
+    $imageFileType = explode(".",$_FILES['file']['name']);
+    if (!in_array($imageFileType[1], $allowed_file_types) || !in_array($type,$allowed_mime_types)) {
+        echo json_encode(['message' => "Sorry, only JPG, JPEG, PNG files are alloweasdasdd."]);
+        exit;
     }
     else if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
         

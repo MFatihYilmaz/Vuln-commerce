@@ -47,6 +47,7 @@ async function register() {
     })
    
 }
+document.getElementById('asd').children[0].inner
 
 async function resetPassword(){
     let body=document.getElementById('card-body')
@@ -59,9 +60,6 @@ async function resetPassword(){
             user_name:document.getElementById('username').value
         })
     }).then(response=>response.json())
-    ASDSKKKKKKKKKKK
-    aSDLASDL
-    ASLDASLDAD
     .then(data=>{
         if(data.link){
             document.getElementsByClassName('warning')[0].innerHTML="";
@@ -238,26 +236,28 @@ async function getProfile() {
     let cookieVal=getCookie('userTracking')
     params.append('userTracking',cookieVal)
 	var authHeader = localStorage.getItem('token');
-	let navLink
     fetch(restApi+'/users?'+params, 
     { 
-        mode:"no-cors",
         headers: {
+            'Content-Type':'application/json',
             'Cookie':params,
             'Authorization': 'Bearer '+authHeader,
         } 
     })
 		.then(response => response.json())
 		.then(data => {
+            console.log(data);
 			let user=data.user
-            if(user.user_role==1){
-                navLink=`
-                <li class="nav-item">
-                <a class="nav-link mx-2 text-black" id='admin' onclick="adminfunc()" href="#">Admin</a>
-              </li>
-                `   
-                document.getElementsByClassName('navbar-nav')[0].insertAdjacentHTML('beforeend',navLink) 
-            }
+            console.log(user);
+            // if(user.user_role==1){
+            //     navLink=`
+            //     <li class="nav-item">
+            //     <a class="nav-link mx-2 text-black" id='admin' onclick="adminfunc()" href="#">Admin</a>
+            //   </li>
+            //     `   
+            //     document.getElementsByClassName('navbar-nav')[0].insertAdjacentHTML('beforeend',navLink) 
+            // }
+            console.log(user);
             document.getElementById('hi').innerHTML='Merhaba <b>'+user.name+' '+user.surname+'</b>';
             
 		})

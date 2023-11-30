@@ -9,6 +9,12 @@
         $name=$user['name'];
     }
     
+    $ch=curl_init('http://127.0.0.1:5000/api/categories');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $res=curl_exec($ch);
+    $decoded=json_decode($res);
+    ?>
+    <?php 
     $t = '
     <!DOCTYPE html>
     <html lang="en">
@@ -37,7 +43,9 @@
                     },
                 };
             </script>
-            <title>LaraGigs | Find Laravel Jobs & Projects</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+            <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+            <title>Our Shop</title>
         </head>
         <body class="mb-48" onload="getAllProd()">
          
@@ -86,149 +94,115 @@
                 </div>
             </section>
     
-            <main>
+            <main>  
+            <section class=mb-3>
+            <div class="container pt-5">
+              <nav class="row gy-4">
+                <div class="col-lg-8 mx-auto col-md-12">
+                  <div class="row">
+                 <div class="col-3">
+                    <a href="#" class="text-center d-flex flex-column justify-content-center">
+                      <button type="button" class="btn btn-outline-secondary mx-auto p-3 mb-2" data-mdb-ripple-color="dark">
+                      <i class="fa-solid fa-laptop"></i>
+                      </button>
+                      <div class="text-dark">Electronics</div>
+                    </a>
+                  </div>
+                   
+                  <div class="col-3">
+                    <a href="#" class="text-center d-flex flex-column justify-content-center">
+                      <button type="button" class="btn btn-outline-secondary mx-auto p-3 mb-2" data-mdb-ripple-color="dark">
+                      <i class="fa-solid fa-house"></i>
+                      </button>
+                      <div class="text-dark">Home</div>
+                    </a>
+                  </div>
+                  <div class="col-3">
+                  <a href="#" class="text-center d-flex flex-column justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary mx-auto p-3 mb-2" data-mdb-ripple-color="dark">
+                    <i class="fa-solid fa-shirt"></i>
+                    </button>
+                    <div class="text-dark">Clothes</div>
+                  </a>
+                </div>
+                <div class="col-3">
+                <a href="#" class="text-center d-flex flex-column justify-content-center">
+                  <button type="button" class="btn btn-outline-secondary mx-auto p-3 mb-2" data-mdb-ripple-color="dark">
+                  <i class="fa-solid fa-list"></i>
+                  </button>
+                  <div class="text-dark">Others</div>
+                </a>
+              </div>
+                   
+                   </div>
+                </div>
+              
+              </nav>
+            </div>
+          </section>
                 
                 <div
-                    class="lg:grid lg:grid-cols-2 gap-4 space-y-4 md:space-y-0 mx-4" id="container"
+                    class="gap-4 space-y-4 md:space-y-0 mx-auto" id="container"
                 >
+                <div class="row flex justify-content-between">
                     <!-- Item 1 -->
-                    <div class="bg-gray-50 border border-gray-200 rounded p-6">
+                    <div class="col-4">
+                    <div class="bg-gray-50 border bg-info border-gray-200 rounded p-6">
                         <div class="flex">
-                            <img
-                                class="hidden w-48 mr-6 md:block"
-                                src="images/acme.png"
-                                alt=""
-                            />
+                           
                             <div>
-                                <h3 class="text-2xl">
-                                    <a href="show.html">Senior Laravel Developer</a>
+                                <h3 class="text-2xl ">
+                                    <a href="#">Super Campaigns
+                                    </a>
                                 </h3>
                                 <div class="text-xl font-bold mb-4">Acme Corp</div>
-                                <ul class="flex">
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Laravel</a>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">API</a>
-                                    
-                            </li>
-                                
-                                <li
-                                
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Backend</a>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Vue</a>
-                                    </li>
-                                </ul>
-                                <div class="text-lg mt-4">
-                                    <i class="fa-solid fa-location-dot"></i> Boston,
-                                    MA
-                                </div>
+                               
+                        
                             </div>
                         </div>
+                    </div>
                     </div>
                     <!-- Item 2 -->
-                    <div class="bg-gray-50 border border-gray-200 rounded p-6">
-                        <div class="flex">
-                            <img
-                                class="hidden w-48 mr-6 md:block"
-                                src="images/stark.png"
-                                alt=""
-                            />
+                    <div class="col-4">
+                    <div class="bg-gray-50 border border-gray-200 bg-info rounded p-6">
+                        <div class="flex justify-content-end">
+                           
                             <div>
-                                <h3 class="text-2xl">
-                                    <a href="show.html">Full-Stack Engineer</a>
+                                <h3 class="text-2xl ">
+                                    <a href="products.htmlgit">Cheap Products</a>
                                 </h3>
-                                <div class="text-xl font-bold mb-4">
-                                    Stark Industries
-                                </div>
-                                <ul class="flex">
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Laravel</a>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">API</a>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Backend</a>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Vue</a>
-                                    </li>
-                                </ul>
-                                <div class="text-lg mt-4">
-                                    <i class="fa-solid fa-location-dot"></i>
-                                    Lawrence, MA
-                                </div>
+                                <div class="text-xl font-bold mb-4">Retailer</div>
+                               
+                        
                             </div>
                         </div>
                     </div>
-    
+                    </div>
+                    <div class="row flex justify-content-center">
                     <!-- Item 3 -->
-                    <div class="bg-gray-50 border border-gray-200 rounded p-6">
-                        <div class="flex">
-                            <img
-                                class="hidden w-48 mr-6 md:block"
-                                src="images/wayne.png"
-                                alt=""
-                            />
+                    <div class="col-4">
+                    <div class="bg-gray-50 border border-gray-200 bg-warning rounded p-6">
+                        <div class="flex justify-content-center">
+                           
                             <div>
                                 <h3 class="text-2xl">
-                                    <a href="show.html">Laravel Developer</a>
+                                    <a href="security.html">We prioritize the security of our customers</a>
                                 </h3>
-                                <div class="text-xl font-bold mb-4">
-                                    Wayne Enterprises
-                                </div>
-                                <ul class="flex">
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Laravel</a>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">API</a>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Backend</a>
-                                    </li>
-                                    <li
-                                        class="flex items-center justify-center bg-black text-white rounded-xl py-1 px-3 mr-2 text-xs"
-                                    >
-                                        <a href="#">Vue</a>
-                                    </li>
-                                </ul>
-                                <div class="text-lg mt-4">
-                                    <i class="fa-solid fa-location-dot"></i> Newark,
-                                    NJ
-                                </div>
+                                <div class="text-xl font-bold mb-4">SOC Analyst</div>
+                               
+                                    
+                                
+                               
+                        
                             </div>
                         </div>
+                    </div>
+                    </div>
                     </div>
                     <footer
                     class="fixed bottom-0 left-0 w-full flex items-center justify-start font-bold bg-laravel text-white h-24 mt-24 opacity-90 md:justify-center"
                 >
-                    <p class="ml-2">Copyright &copy; 2022, All Rights reserved</p>
+                    <p class="ml-2">Copyright &copy; 2023, All Rights reserved</p>
                 </footer>
                 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
                 <script src="script.js"></script>
