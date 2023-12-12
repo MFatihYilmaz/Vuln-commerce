@@ -885,6 +885,13 @@ async function searchVal() {
 
 
 }
+function verifyCaptcha() {
+    var responseKey = grecaptcha.getResponse();
+    console.log(responseKey);
+    if(responseKey!=""){
+        login()
+    }
+}
 
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

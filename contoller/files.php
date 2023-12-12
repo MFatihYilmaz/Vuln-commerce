@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $jwt) {
     $allowed_mime_types=['image/png','image/jpg','image/jpeg'];
     $imageFileType = explode(".",$_FILES['file']['name']);
     if (!in_array($imageFileType[1], $allowed_file_types) || !in_array($type,$allowed_mime_types)) {
-        echo json_encode(['message' => "Sorry, only JPG, JPEG, PNG files are alloweasdasdd."]);
+        echo json_encode(['message' => "Sorry, only JPG, JPEG, PNG files are allow"]);
         exit;
     }
     else if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
