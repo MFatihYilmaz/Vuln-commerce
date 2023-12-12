@@ -861,7 +861,7 @@ async function searchVal() {
                                 <!-- Product price-->
                                 <span class="text-muted text-decoration-line-through">$20.00</span>
                                 $`+prod.product_price+`
-                            </div>
+                            git</div>
                         </div>
                         <!-- Product actions-->
                         <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
