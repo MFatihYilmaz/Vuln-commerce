@@ -1,4 +1,4 @@
-const restApi='http://127.0.0.1:5000/api'
+const restApi='http://api.vulncommerce:5051/api'
 
 async function checkToken() {
 	if (localStorage.getItem('token')) {
@@ -40,6 +40,7 @@ async function register() {
             
             window.location='login.html'
         }else{
+            document.getElementsByClassName('help-block')[0].classList.add('bg-danger');
             document.getElementsByClassName('help-block')[0].innerHTML='Username is used'
         }
     }).catch(e=>{
@@ -47,14 +48,15 @@ async function register() {
     })
    
 }
-document.getElementById('asd').children[0].inner
 
 async function resetPassword(){
     let body=document.getElementById('card-body')
     fetch(restApi+'/resetpass',{
         method:'POST',
         headers:{
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Host':'127.0.0.1:80'
+            
         },
         body:JSON.stringify({
             user_name:document.getElementById('username').value
@@ -62,13 +64,23 @@ async function resetPassword(){
     }).then(response=>response.json())
     .then(data=>{
         if(data.link){
+            var link=data.link
+            const domainRegex  = /^(?:https?:\/\/)?(?:www\.)?([^\/:]+)(?::(\d+))?\/?/;
+            var match=link.match(domainRegex);
+            if (match[2]) {
+                console.log(match[1]+':'+match[2]);
+                link=link.replace(match[1]+':'+match[2],'127.0.0.1/apps/views')
+                
+            }else{
+                link=link.replace(match[1],'127.0.0.1/apps/views')
+            }
             document.getElementsByClassName('warning')[0].innerHTML="";
             if(body.lastChild.textContent=='Reset Link'){
                 body.removeChild(body.lastChild)
             }
             let reset=document.createElement('a')        
             reset.text='Reset Link';
-            reset.setAttribute('href',data.link)
+            reset.setAttribute('href',link)
             body.appendChild(reset)
         }else{
             if(body.lastChild.textContent=='Reset Link'){
@@ -109,6 +121,28 @@ async function login(){
     
 }
 
+function changePass(){
+    var urlParams=new URLSearchParams(window.location.search);
+    let token=urlParams.get('token')
+    fetch(restApi+'/changepass?token_id='+token,{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json',
+        },
+        body:JSON.stringify({
+            pass:document.getElementById('password').value,
+            repass:document.getElementById('re-password').value
+        })
+    })
+    .then(response=>response.json())
+    .then(data=>{
+        if(data.status==200){
+            window.location.href='login.html'
+        }else{
+         document.getElementsByClassName['warning'][0].innerHTML=data.message;
+        }
+    })
+}
 
 function logout(){
     localStorage.removeItem('token');
@@ -140,6 +174,7 @@ async function fileUpload(){
         },2000)
         let photo_name=atob(decodeURIComponent(getCookie('photo')))
         document.getElementById('profile-img').setAttribute('src','./uploads/'+photo_name);
+        document.getElementById('nav-img').setAttribute('src','./uploads/'+photo_name);
        
     })
    
@@ -230,6 +265,7 @@ async function getProfile() {
     if(getCookie('photo')){
         let photo_name=atob(decodeURIComponent(getCookie('photo')))
         document.getElementById('profile-img').setAttribute('src','./uploads/'+photo_name);
+        document.getElementById('nav-img').setAttribute('src','./uploads/'+photo_name)
     }
 
     let params=new URLSearchParams();
@@ -249,16 +285,15 @@ async function getProfile() {
             console.log(data);
 			let user=data.user
             console.log(user);
-            // if(user.user_role==1){
-            //     navLink=`
-            //     <li class="nav-item">
-            //     <a class="nav-link mx-2 text-black" id='admin' onclick="adminfunc()" href="#">Admin</a>
-            //   </li>
-            //     `   
-            //     document.getElementsByClassName('navbar-nav')[0].insertAdjacentHTML('beforeend',navLink) 
-            // }
-            console.log(user);
-            document.getElementById('hi').innerHTML='Merhaba <b>'+user.name+' '+user.surname+'</b>';
+            if(user.user_role==1){
+                navLink=`
+                <li class="nav-item">
+                <a class="nav-link mx-2 text-black" id='admin' onclick="adminfunc()" href="#">Admin</a>
+              </li>
+                `   
+                document.getElementsByClassName('navbar-nav')[0].insertAdjacentHTML('beforeend',navLink) 
+            }
+            document.getElementById('hi').innerHTML=' Merhaba <b>'+user.name+' '+user.surname+'</b> ';
             
 		})
 		.catch(error => {
@@ -361,27 +396,16 @@ async function getOrdersDetail(){
                     </div>
                 </div>
                 </div>`
-                    
-                    
-                
-                  
-        
-                   
+                                       
                });
                 
                   document.getElementById('ordercontent').innerHTML=orderHtml 
         }else{
             document.getElementById('ordercontent').innerHTML=data.message
-        }
-
-       
-     
-       
+        }   
       
     })
    
-    
-    
 }
 async function getOrders() {
     let token=localStorage.getItem('token')
@@ -416,8 +440,6 @@ async function getOrders() {
                         </div>
                             </div>
                             </div>`
-        
-                   
                });
                 
                   document.getElementById('ordercontent').innerHTML=orderHtml 
@@ -429,9 +451,9 @@ async function getOrders() {
 }
 
 async function adminfunc() {
-    
-    let photo_name=atob(decodeURIComponent(getCookie('photo')))
-    
+    if(getCookie('photo')){
+        var photo_name=atob(decodeURIComponent(getCookie('photo')))
+    }
     
     let token=localStorage.getItem('token');
     let users=''
@@ -537,6 +559,7 @@ async function removeUser(clicked){
 
 async function updateBasket(click){
     let id =click.classList[click.classList.length-1]
+    console.log(id);
     var quantity;
     if(click.classList.contains('left')){
         quantity=click.nextElementSibling.value
@@ -549,8 +572,9 @@ async function updateBasket(click){
     fetch(restApi+'/basket/update',{
         method:'POST',
         headers:{
+            'Content-Type':'application/json',
             'Authorization':'Bearer '+token,
-            'Content-Type':'application/json'
+            
         },
         body:JSON.stringify({
             product_id:id,
@@ -559,8 +583,9 @@ async function updateBasket(click){
     }).then(response=>response.json())
     .then(data=>{
         console.log(data);
-        getBasket();
+        getBasket()
     })
+   
 }
 
 
@@ -585,7 +610,7 @@ async function getBasket() {
         let price=basketVal.basket_total;
         let productVal=data.products;
             totalPrice=`
-            <div class="d-flex justify-content-between mb-4">
+            <div class="d-flex justify-content-between px-4 mb-4">
             <div class="col-md-4 mb-4 mr-4" style="font-weight: 500;">
               <p class="mb-2">Total</p>
               <p class="mb-2">$${price}</p>
@@ -604,7 +629,7 @@ async function getBasket() {
                 <tr>
                 <th scope="row">
                                 <div class="d-flex align-items-center">
-                                  <img src="x" class="img-fluid rounded-3"
+                                  <img src="#" class="img-fluid rounded-3"
                                     style="width: 120px;" alt="Book">
                                   <div class="flex-column ms-4">
                                     <p class="mb-2">${element.product_name}</p>
@@ -618,7 +643,7 @@ async function getBasket() {
                                     <i class="fas fa-minus"></i>
                                   </button>
               
-                                  <input id="form1" min="1" name="quantity" oninput="validity.valid||(value='');" value="${basketVal.orders[i][1]}" type="number"
+                                  <input id="form1" min="1" max="10" name="quantity" oninput="validity.valid||(value='');" value="${basketVal.orders[i][1]}" type="number"
                                     class="form-control form-control-sm" style="width: 50px;" />
               
                                   <button class="btn btn-link right px-2 ${element.product_id}"
@@ -665,7 +690,7 @@ async function getBasket() {
 async function buy(){
     let token=localStorage.getItem('token');
     var errorElement = document.getElementById("error");
-    console.log(errorElement);
+    var coupon=document.getElementById('coupon-container');
     fetch(restApi+'/buy',{
         method:'POST',
         headers:{
@@ -678,15 +703,20 @@ async function buy(){
         })
     }).then(response=>response.json())
     .then(data=>{
+           
         if(data.message!='ok'){
-      
-        errorElement.innerHTML = data.message;
+        
+            errorElement.innerHTML = data.message;
         errorElement.classList.remove('d-none');
         errorElement.classList.add('d-inline')
         timer = setTimeout(function(){ errorElement.classList.add('d-none'); errorElement.innerHTML=""; }, 2000);
-    }
-        getBasket()
+    
+        }else{
+            coupon.classList.add('d-none')
+        }
+    getBasket()  
     })
+    
 }
 async function sendMessage(){
     console.log('ads');
@@ -708,7 +738,6 @@ async function sendMessage(){
     req.setRequestHeader('Authorization','Bearer '+token);
     req.onreadystatechange=function(){
         if(req.status==200 && req.readyState==4){
-           console.log(req.response);
     }
    
     }  
@@ -805,7 +834,8 @@ async function checkStock(){
 async function addBasket(){
     document.getElementById('add-result').innerHTML=''
     let resp=await checkStock()
-    if (checkToken()&& resp) {
+    let tokenControl=checkToken()
+    if (tokenControl && resp) {
 		const urlParams = new URLSearchParams(window.location.search);
 		let idVal = urlParams.get('product_id');
 		var token = localStorage.getItem('token');
@@ -829,12 +859,12 @@ async function addBasket(){
     }
 }
 
-async function searchVal() {
-    // Buraya tekrar bak script alert çalışmıyor bazı sayfa yükeleme problemleri
 
+async function searchVal() {
     let searchBar=document.getElementById('search')
     console.log(searchBar.value)
         let productHTML=''
+    
     fetch(restApi+'/search/'+searchBar.value)
     .then(response=>response.json())
     .then(data=>{
@@ -886,12 +916,71 @@ async function searchVal() {
 
 }
 function verifyCaptcha() {
-    var responseKey = grecaptcha.getResponse();
-    console.log(responseKey);
-    if(responseKey!=""){
-        login()
-    }
+   
+    login()
+    
 }
+
+function addCode(){
+    let token=localStorage.getItem('token');
+    fetch(restApi+'/coupon/add',{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer '+token
+        },
+        body:JSON.stringify({
+            coupon:document.getElementById('coupon').value
+        })
+    }).then(response=>response.json())
+    .then(data=>{
+        let codeElement=document.getElementById('coupon-container');
+        let promo=document.getElementById('promo')
+        let codeBtn=document.getElementById('codeBtn')
+        if(data.message=="Code applied"){
+            codeElement.lastElementChild.classList.remove('d-none')
+            promo.classList.add('bg-success')
+            promo.innerText=document.getElementById('coupon').value
+            promo.classList.remove('bg-danger')
+            codeElement.classList.remove('d-none')
+            codeBtn.disabled=true
+            getBasket()
+        }else{
+                codeElement.lastElementChild.classList.add('d-none')
+                promo.innerHTML=data.message
+                promo.classList.remove('bg-success')
+                promo.classList.add('bg-danger')
+                codeElement.classList.remove('d-none')
+        
+            
+            setTimeout(function () {
+                codeElement.classList.add('d-none')
+            }, 3000);
+
+        }
+    }).catch(
+        error=>console.log(error)
+    )
+}
+function removeCode(){
+    let token=localStorage.getItem('token');
+    fetch(restApi+'/coupon/remove',{
+        headers:{
+            'Authorization':'Bearer '+token
+        }
+    }).then(response=>response.json()
+    ).then(data=>{
+        let codeBtn=document.getElementById('codeBtn')
+        let codeElement=document.getElementById('coupon-container');
+        if (data.message=='OK'){
+            codeElement.classList.add('d-none')  
+            codeBtn.disabled=false;
+           
+        }
+        getBasket()
+    })
+}
+
 
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

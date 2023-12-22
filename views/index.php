@@ -169,7 +169,7 @@
                            
                             <div>
                                 <h3 class="text-2xl ">
-                                    <a href="products.htmlgit">Cheap Products</a>
+                                    <a href="products.html">Cheap Products</a>
                                 </h3>
                                 <div class="text-xl font-bold mb-4">Retailer</div>
                                
