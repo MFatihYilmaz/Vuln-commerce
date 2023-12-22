@@ -22,7 +22,6 @@ class WalletCreate
      */
     public function handle(UserCreated $event): void
     {
-          // Kullanıcıya ait wallet oluştur
           $wallet = new Wallet();
           $wallet->user_id = $event->user_id;
           $wallet->deposit = 0; 

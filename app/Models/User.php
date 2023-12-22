@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, HasUuids;
@@ -23,6 +24,10 @@ class User extends Authenticatable implements JWTSubject
         'surname',
         'password',
     ];
+    protected $hidden = [
+        'password',
+    ];
+
     protected $primaryKey='user_name';
     public $timestamps = false;
 

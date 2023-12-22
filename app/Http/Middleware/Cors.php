@@ -13,13 +13,13 @@ class Cors
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {   
         $response = $next($request);
      
         if($request->getMethod()==='OPTIONS'){
            
-            $response->headers->set('Access-Control-Allow-Origin', '127.0.0.1');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', '*');
         $response->headers->set('Access-Control-Allow-Credentials','true');

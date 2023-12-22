@@ -16,7 +16,7 @@ use App\Http\Controllers\apiController;
 |
 */
 
-Route::middleware('auth:api','cors')->get('/user', function () {
+Route::middleware('auth:api')->get('/user', function () {
     return auth('api')->user();
 });
 
@@ -24,6 +24,7 @@ Route::controller(apiController::class)->group(function (){
     Route::get('/users/all','getAllUsers');
     Route::post('/register',"register");
     Route::post('/login','login')->name('login');
+    Route::post('changepass','changePass');
     Route::get('/users',"getUser");
     Route::get('/products/all','listproducts');
     Route::post('/addresses/{username}','setAddress');
@@ -37,6 +38,7 @@ Route::controller(apiController::class)->group(function (){
     Route::get('/products/{id}','getProductDetails');
     Route::get('/categories','getCategories');
     Route::get('/search/{search?}','search')->where('search', '(.*)');
+    Route::get('/swagger.json','swagger');
     Route::post('/uploadFile','fileUpload');
     Route::get('/getfile','getFile');
     Route::post('/checkstock','checkStock');
@@ -45,5 +47,7 @@ Route::controller(apiController::class)->group(function (){
     Route::post('/ticket','getMessage');
     Route::post('/buy','buyProduct');
     Route::post('/resetpass','resetPass');
+    Route::post('/coupon/add','couponCode');
+    Route::get('/coupon/remove','removeCouponCode');
     
 });

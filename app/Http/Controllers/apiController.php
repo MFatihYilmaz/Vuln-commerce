@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\UserCreated;
 use App\Models\Address;
 use App\Models\Basket;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\Token;
 use App\Models\User;
@@ -22,6 +23,8 @@ use PHPUnit\Event\Code\Throwable;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
 
 class apiController extends Controller
 {
@@ -50,8 +53,8 @@ class apiController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' =>'Couldn\'t create token'], 500);
         }
-        
         $serialized=base64_encode(serialize($user->toArray()));
+
 
 
         // $data = strval(implode($user->toArray()));
@@ -88,6 +91,7 @@ class apiController extends Controller
 
     public function register(Request $request){
     try {
+        
        
         $request->validate([
 
@@ -119,6 +123,44 @@ class apiController extends Controller
         ]);
     }
     }
+
+public function changePass(Request $req){
+    try{
+        $req->validate([
+            'pass'=>'string|min:6',
+            'repass'=>'string|min:6'
+        ]);
+
+        if($req->pass===$req->repass){
+            $token=Token::where('token',$req->query('token_id'))->first();
+            $user=User::where('user_name',$token->user_name)->first();
+            if($user){
+                $user->password=Hash::make($req->pass);
+                $user->save();
+                event(new PasswordReset($user));
+                return response()->json([
+                    'message'=>'Password successfully changed',
+                    'status'=>200
+                ],200);
+            }
+        }
+        return response()->json([
+            'message'=>'Password doesnt match'
+         ]);
+    }catch (Exception $e){
+        return response()->json([
+           'message'=>'Password must be min 6 char'
+        ]);
+    }
+}
+
+public function swagger(){
+    $remoteImage = public_path().'/swagger.json';
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $remoteImage);
+    header("Content-type: {$mimeType}");
+    readfile($remoteImage);
+}
   
 
 public function resetPass(Request $req){
@@ -132,7 +174,7 @@ public function resetPass(Request $req){
         ]);
         $createdToken = Token::find($token->id);
         return response()->json([
-            'link'=>$req->getHttpHost().'/reset.html?token='.$createdToken->token,
+            'link'=>'http://'.$req->getHttpHost().'/reset.html?token='.$createdToken->token,
         ]);
     }
     return response()->json([
@@ -267,13 +309,16 @@ public function resetPass(Request $req){
                 'message'=>'insufficent balance'
             ]);
         }
-
-        
-        $wallet->deposit-=$req->amount;        
-       
-        $wallet->save(); 
+        $coupon=Coupon::where('user_id',$user->user_id)->where('used',1)->first();
+        if($coupon){
+            $coupon->perm=1;
+            $coupon->save();
+        }
+        $wallet->deposit-=$req->amount;          
         $basket=$eluser->basket->where('basket_status',0)->first();
         $basket->basket_status=1;
+        $wallet->save();
+       
         $basket->save();
         return response()->json([
             'message'=>'ok'
@@ -463,6 +508,11 @@ public function resetPass(Request $req){
         
     }
     public function updateBasket(Request $req){
+       try{ 
+        $req->validate([
+            "product_id"=>"required|string|max:255",
+            'quantity'=>'int|max:10'
+        ]);
         $user=auth()->user();
         $basket=Basket::where('user_id',$user->user_id)->where('basket_status',0)->first();
         $orders=$basket->orders;
@@ -484,6 +534,11 @@ public function resetPass(Request $req){
         return response()->json([
             'message'=>'ok'
         ]);
+    }catch(ValidationException $e){
+        return response()->json([
+            'message'=>'Max amount exceed'
+        ]);
+    }
     }   
     public function addBasket(Request $req){
         $req->validate([
@@ -582,26 +637,24 @@ public function resetPass(Request $req){
     }
 
     public function getFile(Request $req){
-    $remoteImage = public_path().'/img/'.$req->query('file');
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mimeType = finfo_file($finfo, $remoteImage);
-    header("Content-type: {$mimeType}");
-    readfile($remoteImage);
-        
-        return response()->json([
-            'data'=>'ok'
-        ]);
-    }
-   
-    private function controlURL($url){
-        $blackedList=['127.1','127.0.1','127.000.000.1','localhost'];
-        if(str_starts_with($url,'http://127.0.0.1:5000')||in_array(parse_url($url,PHP_URL_HOST),$blackedList)){
-            return false;
+        $remoteImage = public_path().'/img/'.$req->query('file');
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $remoteImage);
+        header("Content-type: {$mimeType}");
+        readfile($remoteImage);
+            
+            return response()->json([
+                'data'=>'ok'
+            ]);
         }
-        return true;
-       }
-
-
+    
+    private function controlURL($url){
+            $blackedList=['127.1','127.0.1','127.000.000.1','localhost'];
+            if(str_starts_with($url,'http://127.0.0.1:5000')||in_array(parse_url($url,PHP_URL_HOST),$blackedList)){
+                return false;
+            }
+            return true;
+    }
     public function checkStock(Request $req){
         $validator= Validator::make($req->all(),[
             'stockApi'=>'required|url'
@@ -631,9 +684,81 @@ public function resetPass(Request $req){
         
     }
     
-    public function randomStock(){
-        return rand(1,1000);
+   
+   public function couponCode(Request $req){
+    $user=auth()->user();
+    
+    try{
+
+        $code=Coupon::where('user_id',$user->user_id)->first();
+        if(!$code){
+            $code=Coupon::create([
+                'user_id'=>$user->user_id
+            ]);
+        }
+        if($req->coupon=='SHOP20' && !$code->used){
+        $userBasket=Basket::where('user_id',$user->user_id)->where('basket_status',0)->first();
+        if($userBasket){
+            $userBasket->basket_total=$userBasket->basket_total*8/10;
+            $userBasket->save(); 
+            $code->used=true;
+            $code->save();  
+            return response()->json([
+                'message'=>'Code applied'
+            ]);
+       
+        }
+        return response()->json([
+            'message'=>'Basket is empty'
+        ]);    
+           
+          
+          
+        }
+        
+        return response()->json([
+            'message'=>'Code used or not valid'
+        ]);
+    }catch(Exception $e){
+        return response()->json([
+            'message'=>'Error'.$e
+        ]);
+    } 
+   }
+   private function useCode($user){
+   
+   }
+
+   private function basketCoupon($user){
+        
+   }
+
+   public function removeCouponCode(){
+    $user=auth()->user();
+    $coupon=Coupon::where('user_id',$user->user_id)->where('perm',0)->first();
+    $basket=Basket::where('user_id',$user->user_id)->where('basket_status',0)->first();
+    
+    if(!empty($basket->orders) && $coupon){
+        $orders=$basket->orders;
+        $total=array_reduce($orders,function($carry,$item){
+                    
+            $carry+=$item[1]*$item[2];
+            return $carry;
+        });
+    
+        $coupon->used=0;
+        $coupon->save();
+        $basket->basket_total=$total;
+        $basket->save();
+        return response()->json([
+            'message'=>'OK'
+        ],200);
     }
+    return response()->json([
+        'message'=>''
+    ],200);
+}
 
 }
+
 
