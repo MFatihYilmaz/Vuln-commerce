@@ -1,3 +1,1 @@
-
-f1f7c24675a1d62ab3c98546972eeb137ba38538f5a6d7e0318880adf39ed770
-Dosya Yükleme yerinde bas64_encode edilmiş dosya geliyor
+Fox dont send to photos github account

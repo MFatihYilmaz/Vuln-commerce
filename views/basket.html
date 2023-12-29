@@ -38,7 +38,7 @@ input[type=number] {
 }
     </style>
 </head>
-<body onload="getBasket()">
+<body onload="getBasket();getAddress()">
     <nav class="nav navbar navbar-expand-sm navbar-light d-flex" id="neubar">
         <div class="container">
           <a class="navbar-brand" href="#">Our Shop</a>
@@ -76,6 +76,18 @@ input[type=number] {
     <div class="container">
         <section class="h-100 h-custom">
             <div class="container h-100 py-5">
+              <div class="container mt-3">
+                <h3>Select Address</h2>
+              
+                  <div id="addressbar" class="form-group d-flex">
+              
+                   
+                  </div>
+              
+                 
+                 
+                  </div>
+              
               <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col">
                   
@@ -133,6 +145,7 @@ input[type=number] {
             </div>
           </section>
     </div>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

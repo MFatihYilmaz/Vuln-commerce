@@ -12,7 +12,7 @@ async function checkToken() {
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    if (parts.length == 2) return parts.pop().split(';').shift();
     }
 
 function setCookie(cname, cvalue, exdays) {
@@ -91,7 +91,7 @@ async function resetPassword(){
     })
 }
 
-async function login(){
+async function login(captcha){
     fetch(restApi+'/login',{
         method:'POST',
         headers:{
@@ -99,7 +99,8 @@ async function login(){
         },
         body:JSON.stringify({
             user_name:document.getElementById('username').value,
-            password:document.getElementById('password').value
+            password:document.getElementById('password').value,
+            g_captcha:captcha
         })
     })
     .then(response=>response.json())
@@ -249,15 +250,33 @@ async function setAddress(){
 }
 
 async function getAddress() {
- let token = localStorage.getItem('token')
- let username=payloadsJWT(token)
+    let token = localStorage.getItem('token')
+ let username=payloadsJWT(token).username
+ let address=document.getElementById('addressbar')
+ let htmlContent=""
  fetch(restApi+'/addresses/'+username,{
     headers:{
         'Authorization':'Bearer '+token,
     }
  }).then(response=>response.json())
  .then(data=>{
-    data
+    let value=data.addresses
+    if(value){
+        htmlContent=`
+        <div class="form-check ">
+        <input type="radio" class="form-check-input" id="adres1" name="secilenAdres" style=" border: 2px solid #3498db;" value="${value.address_header}">
+        <label for="adres1">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">${htmlEntities(value.address_header)}</h5>
+            <p class="card-text">${htmlEntities(value.address)}</p>
+          </div>
+        </div>
+      </label>
+      </div>`
+    }
+    
+    address.insertAdjacentHTML('afterbegin',htmlContent)
  }) 
 }
 
@@ -293,7 +312,7 @@ async function getProfile() {
                 `   
                 document.getElementsByClassName('navbar-nav')[0].insertAdjacentHTML('beforeend',navLink) 
             }
-            document.getElementById('hi').innerHTML=' Merhaba <b>'+user.name+' '+user.surname+'</b> ';
+            document.getElementById('hi').innerHTML=' Merhaba <b>'+htmlEntities(user.name)+' '+htmlEntities(user.surname)+'</b> ';
             
 		})
 		.catch(error => {
@@ -916,8 +935,12 @@ async function searchVal() {
 
 }
 function verifyCaptcha() {
-   
-    login()
+    var response = grecaptcha.getResponse();
+    if(response!=""){
+        login(true)
+    }else{
+        login(false)
+    }  
     
 }
 
@@ -983,7 +1006,7 @@ function removeCode(){
 
 
 function htmlEntities(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, "//");
 }
 
 function payloadsJWT(token){

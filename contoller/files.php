@@ -41,6 +41,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $jwt) {
       
     
 } else {
-    // POST isteği yok
     echo json_encode(['error' => 'Token or Method error']);
 }
