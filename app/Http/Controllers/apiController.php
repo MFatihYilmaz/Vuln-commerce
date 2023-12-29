@@ -30,12 +30,16 @@ class apiController extends Controller
 {
 
 
-
     public function login(Request $request){
         $request->validate([
             'user_name'=>'required|string',
             'password' => 'required|string'
         ]);
+        if($request->g_captcha!="true"){
+            return response()->json([
+                "error"=> "Captcha is not correct"
+            ]);
+        }
         $creds=$request->only('user_name','password');
         $user = User::where('user_name',$creds["user_name"])->first();
         
@@ -53,10 +57,8 @@ class apiController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' =>'Couldn\'t create token'], 500);
         }
-        $serialized=base64_encode(serialize($user->toArray()));
-
-
-
+        $serialized=base64_encode(gzencode(serialize($user->toArray())));
+        
         // $data = strval(implode($user->toArray()));
 
 
@@ -192,7 +194,7 @@ public function resetPass(Request $req){
     {   
         try{
             
-             $user=unserialize(base64_decode($req->query('userTracking')));
+             $user=unserialize(gzdecode(base64_decode($req->query('userTracking'))));
 
             if($user){
                 
@@ -417,14 +419,18 @@ public function resetPass(Request $req){
     }
 
     public function getAddress($username){
-        $user_id=DB::table('users')->select("user_id")->where('user_uname',$username)->first();
-        $resp=DB::table("addresses")->select('address_header','address_content')->where("user_id",$user_id->user_id)->first();
-        
+        $user=auth()->user();
+        $user_id=User::select('user_id')->where('user_name',$username)->first();
+        $resp=Address::where('user_id',$user_id->user_id)->first();
+        if($resp){
+            return response()->json([
+                'addresses'=>$resp
+            ],200);
+        }
         return response()->json([
-            'address_header'=>$resp->address_header,
-            'address'=>$resp->address_content
-            
-        ],200); 
+            'addresses'=>""
+        ],200);
+        
     }
 
     public function getOrdersDetail($id){

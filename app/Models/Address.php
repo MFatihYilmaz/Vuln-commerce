@@ -13,5 +13,8 @@ class Address extends Model
         'address',
         'address_header'
     ];
+    protected $hidden = [
+        'user_id'
+    ];
     public $timestamps = false;
 }
